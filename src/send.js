@@ -5,7 +5,9 @@ import nodemailer from 'nodemailer';
  * Fire-and-forget — caller does not await this.
  *
  * @param {object} opts
- * @param {string} opts.from
+ * @param {string} opts.from         Display from (e.g. "Identity <login@id.rac.so>")
+ * @param {string} opts.smtp_user    Bare email for SMTP auth (e.g. "login@id.rac.so")
+ * @param {string} opts.smtp_password
  * @param {string|string[]} opts.to
  * @param {string|string[]|undefined} opts.cc
  * @param {string|string[]|undefined} opts.bcc
@@ -13,20 +15,16 @@ import nodemailer from 'nodemailer';
  * @param {string} opts.subject
  * @param {string|undefined} opts.html
  * @param {string|undefined} opts.text
- * @param {string} opts.smtp_password
  */
 export async function sendEmail(opts) {
-  const { from, to, cc, bcc, reply_to, subject, html, text, smtp_password } = opts;
-
-  // Extract bare email address for SMTP auth (from may be "Name <addr>" format)
-  const smtpUser = (from.match(/<(.+?)>/) || [null, from])[1];
+  const { from, smtp_user, smtp_password, to, cc, bcc, reply_to, subject, html, text } = opts;
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.improvmx.com',
     port: 587,
     secure: false, // STARTTLS
     auth: {
-      user: smtpUser,
+      user: smtp_user,
       pass: smtp_password,
     },
   });
