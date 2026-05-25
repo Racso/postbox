@@ -18,12 +18,15 @@ import nodemailer from 'nodemailer';
 export async function sendEmail(opts) {
   const { from, to, cc, bcc, reply_to, subject, html, text, smtp_password } = opts;
 
+  // Extract bare email address for SMTP auth (from may be "Name <addr>" format)
+  const smtpUser = (from.match(/<(.+?)>/) || [null, from])[1];
+
   const transporter = nodemailer.createTransport({
     host: 'smtp.improvmx.com',
     port: 587,
     secure: false, // STARTTLS
     auth: {
-      user: from,
+      user: smtpUser,
       pass: smtp_password,
     },
   });
